@@ -2,7 +2,7 @@
 #include <cstdlib>
 using namespace std;
 
-int main() {
+int reference_and_deference() {
     int a = 1;                  // a is at location 28c
     int* p1 = new int(2);        // p1 points to new int(2) at location ec0
     int** p2;
