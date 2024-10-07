@@ -137,7 +137,7 @@ bool saveGridToFile(const string& filename, const vector<vector<bool>>& grid, in
 }
 
 // Function to load the grid state from a file
-bool loadGridFromFile(const string& filename, vector<vector<bool>>& grid, int& currentStep) {
+bool loadGridFromFile(const string& filename, vector<vector<bool> >& grid, int& currentStep) {
     ifstream inFile(filename);
     if (!inFile) {
         cerr << "Error: Unable to open file for loading." << endl;
