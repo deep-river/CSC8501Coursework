@@ -49,7 +49,7 @@ void print_tree(struct node* tree) {
 }
 
 void free_tree(struct node* tree) {
-    if (tree == nullptr) {
+    if (tree != nullptr) {
         free_tree(tree->left);
         free_tree(tree->right);
         delete tree;

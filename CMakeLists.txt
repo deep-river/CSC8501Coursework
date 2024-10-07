@@ -9,4 +9,5 @@ add_executable(CSC8501Coursework main.cpp
         PointersAndReferences.cpp
         passing_parameters.cpp
         interaction_and_recursion.cpp
-        arrays.cpp)
+        arrays.cpp
+        ConwaysGameOfLife/mian.cpp)
