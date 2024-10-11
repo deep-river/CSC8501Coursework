@@ -8,6 +8,17 @@
 
 using namespace std;
 
+
+/* to do:
+ * 1. save file and load file 单独写为函数
+ * 2. 尝试用类或者面向对象(类，继承，多态，模版)的形式存储grid
+ * 3. 分析并优化updateGrid()的效率
+ * 4. 添加二叉搜索树
+ * 5. 实现自动化和pattern识别算法
+ *
+ */
+
+
 // Function to display the grid with each cell represented as a space surrounded by four dots
 void displayGrid(const vector<vector<bool>>& grid) {
     int rows = grid.size();
@@ -16,7 +27,7 @@ void displayGrid(const vector<vector<bool>>& grid) {
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             if (i == 0 || i == rows - 1 || j == 0 || j == cols - 1) {
-                cout << ". ";  // Border marker with a space
+                cout << ". ";
             } else {
                 cout << (grid[i][j] ? "O " : ". ");  // Alive or Dead with a space
             }
@@ -112,11 +123,11 @@ bool saveGridToFile(const string& filename, const vector<vector<bool>>& grid, in
     }
 
     // Write grid size
-    outFile << rows << " " << cols << endl;
+    outFile << "Grid size: " << rows << " " << cols << endl;
     // Write alive count
-    outFile << aliveCount << endl;
+    outFile << "Alive cells: " << aliveCount << endl;
     // Write current step
-    outFile << currentStep << endl;
+    outFile << "Current step: " << currentStep << endl;
 
     // Write grid state
     for (int i = 0; i < rows; i++) {
@@ -333,3 +344,11 @@ int main() {
     cout << "\nSimulation completed." << endl;
     return 0;
 }
+
+
+
+/* Run in terminal window
+ * cd "/Users/libangyu/Dev/csc8501coursework/conwaysgameoflife"
+ * lang++ -std=c++17 -o gameoflife main.cpp
+ * ./gameoflife
+ */

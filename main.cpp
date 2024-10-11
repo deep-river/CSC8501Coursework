@@ -3,10 +3,8 @@ using namespace std;
 
 void arrayOfTen();
 
-/*
-int main() {
+/*int main() {
     // cout << "Hello, World!" << std::endl;
     arrayOfTen();
     return 0;
-}
-*/
+}*/
