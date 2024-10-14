@@ -26,9 +26,9 @@ void displayGrid(const vector<vector<bool>>& grid) {
 
     for (int i = 0; i < rows + 1; i++) {
         for (int j = 0; j < cols + 1; j++) {
-            if (i == 0 || i == rows) {
+            if (i == 0) {
                 cout << ". ";
-            } else if (j == 0 || j == cols) {
+            } else if (j == 0) {
                 cout << ".";
             }
             else {
