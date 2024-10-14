@@ -143,7 +143,17 @@ bool saveGridToFile(const string& filename, const vector<vector<bool>>& grid, in
 
 // Function to load the grid state from a file
 // todo: might be problems when loading from file
-bool loadGridFromFile(const string& filename, vector<vector<bool> >& grid, int& currentStep) {
+/**
+ * @brief 从文件中加载游戏网格
+ *
+ * @param filename 文件名
+ * @param grid 网格二维布尔向量
+ * @param currentStep 当前步骤数
+ * @return true 加载成功
+ * @return false 加载失败
+ */
+bool loadGridFromFile(const string& filename, vector<vector<bool>>& grid, int& currentStep) {
+    // 打开文件
     ifstream inFile(filename);
     if (!inFile) {
         cerr << "Error: Unable to open file for loading." << endl;
@@ -153,46 +163,72 @@ bool loadGridFromFile(const string& filename, vector<vector<bool> >& grid, int& 
     int rows, cols, aliveCount;
     string line;
 
-    // Read grid size
+    // 读取网格行数和列数
     if (!(inFile >> rows >> cols)) {
         cerr << "Error: Invalid file format (grid size)." << endl;
         return false;
     }
 
-    // Read alive count
+    // 读取存活细胞数量
     if (!(inFile >> aliveCount)) {
         cerr << "Error: Invalid file format (alive count)." << endl;
         return false;
     }
 
-    // Read current step
+    // 读取当前步骤数
     if (!(inFile >> currentStep)) {
         cerr << "Error: Invalid file format (current step)." << endl;
         return false;
     }
 
-    // Initialize grid
+    // 初始化网格，全部设为死亡
     grid.assign(rows, vector<bool>(cols, false));
 
-    // Read grid state
-    getline(inFile, line); // Consume the remaining newline after currentStep
+    // 读取网格状态
+    getline(inFile, line); // 消耗当前行的剩余换行符
+    getline(inFile, line); // 消耗当前行的剩余换行符
     for (int i = 0; i < rows; i++) {
         if (!getline(inFile, line)) {
             cerr << "Error: Incomplete grid data." << endl;
             return false;
         }
-        stringstream ss(line);
-        for (int j = 0; j < cols; j++) {
-            string cell;
-            if (!(ss >> cell)) {
-                cerr << "Error: Invalid grid data." << endl;
+
+        // 输出当前读取的行内容，便于调试
+        // cout << "Reading row " << i + 1 << ": " << line << endl;
+
+        int j = 0; // 列索引
+        for (char ch : line) {
+            if (ch == '.') {
+                continue; // 忽略分隔符和边界的点
+            }
+            if (ch == 'O') {
+                if (j < cols) {
+                    grid[i][j] = true; // 存活
+                    j++;
+                } else {
+                    cerr << "Error: Too many cells in row " << i + 1 << "." << endl;
+                    return false;
+                }
+            }
+            else if (ch == ' ') {
+                if (j < cols) {
+                    grid[i][j] = false; // 死亡
+                    j++;
+                } else {
+                    cerr << "Error: Too many cells in row " << i + 1 << "." << endl;
+                    return false;
+                }
+            }
+            else {
+                // 处理其他可能的字符
+                cerr << "Error: Invalid character '" << ch << "' in grid data at row " << i + 1 << ", column " << j + 1 << "." << endl;
                 return false;
             }
-            if (cell == "O") {
-                grid[i][j] = true;
-            } else {
-                grid[i][j] = false;
-            }
+        }
+
+        if (j < cols) {
+            cerr << "Error: Not enough cells in row " << i + 1 << "." << endl;
+            return false;
         }
     }
 
