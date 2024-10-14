@@ -9,9 +9,9 @@
 using namespace std;
 
 
-/* to do:
- * 1. save file and load file 单独写为函数
+/* todo:1
  * 2. 尝试用类或者面向对象(类，继承，多态，模版)的形式存储grid
+ * 2. 用类表示grid
  * 3. 分析并优化updateGrid()的效率
  * 4. 添加二叉搜索树
  * 5. 实现自动化和pattern识别算法
@@ -24,12 +24,15 @@ void displayGrid(const vector<vector<bool>>& grid) {
     int rows = grid.size();
     int cols = grid[0].size();
 
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            if (i == 0 || i == rows - 1 || j == 0 || j == cols - 1) {
+    for (int i = 0; i < rows + 1; i++) {
+        for (int j = 0; j < cols + 1; j++) {
+            if (i == 0 || i == rows) {
                 cout << ". ";
-            } else {
-                cout << (grid[i][j] ? "O " : ". ");  // Alive or Dead with a space
+            } else if (j == 0 || j == cols) {
+                cout << ".";
+            }
+            else {
+                cout << (grid[i][j] ? "O." : " .");  // Alive or Dead with a space
             }
         }
         cout << endl;
@@ -61,8 +64,8 @@ vector<vector<bool>> updateGrid(const vector<vector<bool>>& grid) {
     int cols = grid[0].size();
     vector<vector<bool>> newGrid(rows, vector<bool>(cols, false));
 
-    for (int i = 1; i < rows - 1; i++) {
-        for (int j = 1; j < cols - 1; j++) {
+    for (int i = 1; i < rows; i++) {
+        for (int j = 1; j < cols; j++) {
             int aliveNeighbors = countAliveNeighbors(grid, i, j);
             if (grid[i][j] && (aliveNeighbors == 2 || aliveNeighbors == 3)) {
                 newGrid[i][j] = true;  // Stay alive
@@ -89,13 +92,13 @@ vector<vector<bool>> updateGrid(const vector<vector<bool>>& grid) {
 
 // Function to initialize the grid with random alive cells
 void initializeGrid(vector<vector<bool>>& grid, int aliveCount) {
-    int rows = grid.size();
-    int cols = grid[0].size();
+    const int rows = grid.size();
+    const int cols = grid[0].size();
     int placed = 0;
 
     while (placed < aliveCount) {
-        int x = rand() % (rows - 2) + 1;  // Avoid placing on the border
-        int y = rand() % (cols - 2) + 1;
+        int x = rand() % rows;
+        int y = rand() % cols;
         if (!grid[x][y]) {
             grid[x][y] = true;
             placed++;
@@ -209,7 +212,7 @@ bool loadGridFromFile(const string& filename, vector<vector<bool> >& grid, int& 
 int main() {
     srand(static_cast<unsigned int>(time(0)));  // Seed the random number generator
 
-    int rows, cols, aliveCount, steps;
+    int rows, cols, aliveCount, steps, lifePattern;
     vector<vector<bool>> grid;
     int currentStep = 0;
 
@@ -217,8 +220,9 @@ int main() {
     cout << "Conway's Game of Life Simulation\n";
     cout << "---------------------------------\n";
     cout << "1. Start a new simulation\n";
-    cout << "2. Load simulation from file\n";
-    cout << "Enter your choice (1 or 2): ";
+    cout << "2. Load simulation from file\n";;
+    cout << "3. Run until find a life\n";
+    cout << "Enter your choice (1 - 3): ";
     int choice;
     cin >> choice;
 
@@ -238,8 +242,8 @@ int main() {
             cout << "Grid size must be at least 3x3." << endl;
             return 1;
         }
-        if (aliveCount < 0 || aliveCount > (rows - 2) * (cols - 2)) {
-            cout << "Invalid number of alive cells. Must be between 0 and " << (rows - 2) * (cols - 2) << "." << endl;
+        if (aliveCount < 0 || aliveCount > rows * cols) {
+            cout << "Invalid number of alive cells. Must be between 0 and " << rows * cols << "." << endl;
             return 1;
         }
         if (steps < 0) {
@@ -249,9 +253,11 @@ int main() {
 
         // Create the grid
         grid.assign(rows, vector<bool>(cols, false));
+        cout << "Grid assigned" << endl;
 
         // Initialize grid with random alive cells
         initializeGrid(grid, aliveCount);
+        cout << "Grid initialized" << endl;
 
         // Display initial grid
         cout << "\nInitial grid:\n";
@@ -274,6 +280,19 @@ int main() {
         // Display loaded grid
         cout << "\nLoaded grid (Step " << currentStep << "):\n";
         displayGrid(grid);
+    }
+    else if (choice == 3) {
+        cout << "Choose a life pattern: ";
+        cin >> lifePattern;
+        cout << "Enter the number of rows (minimum 3): ";
+        cin >> rows;
+        cout << "Enter the number of columns (minimum 3): ";
+        cin >> cols;
+        cout << "Enter the number of alive cells: ";
+        cin >> aliveCount;
+        cout << "Enter the number of steps: ";
+        cin >> steps;
+        // todo: pattern matching
     }
     else {
         cout << "Invalid choice. Exiting." << endl;
@@ -347,7 +366,8 @@ int main() {
 
 
 
-/* Run in terminal window
+/*
+ * Run in terminal window:
  * cd "/Users/libangyu/Dev/csc8501coursework/conwaysgameoflife"
  * lang++ -std=c++17 -o gameoflife main.cpp
  * ./gameoflife
