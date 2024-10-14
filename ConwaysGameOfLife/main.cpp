@@ -9,8 +9,8 @@
 using namespace std;
 
 
-/* todo:1
- * 2. 尝试用类或者面向对象(类，继承，多态，模版)的形式存储grid
+/* todo:
+ * 1. 尝试用类或者面向对象(类，继承，多态，模版)的形式存储grid
  * 2. 用类表示grid
  * 3. 分析并优化updateGrid()的效率
  * 4. 添加二叉搜索树
@@ -58,35 +58,24 @@ int countAliveNeighbors(const vector<vector<bool>>& grid, int x, int y) {
     return aliveNeighbors;
 }
 
-// Function to update the grid based on the Game of Life rules
+// Function to update the grid
 vector<vector<bool>> updateGrid(const vector<vector<bool>>& grid) {
     int rows = grid.size();
     int cols = grid[0].size();
     vector<vector<bool>> newGrid(rows, vector<bool>(cols, false));
 
-    for (int i = 1; i < rows; i++) {
-        for (int j = 1; j < cols; j++) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
             int aliveNeighbors = countAliveNeighbors(grid, i, j);
             if (grid[i][j] && (aliveNeighbors == 2 || aliveNeighbors == 3)) {
-                newGrid[i][j] = true;  // Stay alive
+                newGrid[i][j] = true;  // Survival
             } else if (!grid[i][j] && aliveNeighbors == 3) {
-                newGrid[i][j] = true;  // Become alive
+                newGrid[i][j] = true;  // Birth
             } else {
-                newGrid[i][j] = false;  // Stay dead or die
+                newGrid[i][j] = false;  // Death
             }
         }
     }
-
-    // Preserve borders as dead (only borders have dots)
-    for (int i = 0; i < rows; i++) {
-        newGrid[i][0] = false;
-        newGrid[i][cols - 1] = false;
-    }
-    for (int j = 0; j < cols; j++) {
-        newGrid[0][j] = false;
-        newGrid[rows - 1][j] = false;
-    }
-
     return newGrid;
 }
 
@@ -107,6 +96,7 @@ void initializeGrid(vector<vector<bool>>& grid, int aliveCount) {
 }
 
 // Function to save the current grid state to a file
+// todo: problem when saving
 bool saveGridToFile(const string& filename, const vector<vector<bool>>& grid, int currentStep) {
     ofstream outFile(filename);
     if (!outFile) {
@@ -119,20 +109,19 @@ bool saveGridToFile(const string& filename, const vector<vector<bool>>& grid, in
     int aliveCount = 0;
 
     // Count alive cells
-    for (int i = 1; i < rows - 1; i++) {
-        for (int j = 1; j < cols - 1; j++) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
             if (grid[i][j]) aliveCount++;
         }
     }
 
     // Write grid size
-    outFile << "Grid size: " << rows << " " << cols << endl;
+    outFile << rows << " " << cols << endl;
     // Write alive count
-    outFile << "Alive cells: " << aliveCount << endl;
+    outFile << aliveCount << endl;
     // Write current step
-    outFile << "Current step: " << currentStep << endl;
+    outFile << currentStep << endl;
 
-    // Write grid state
     for (int i = 0; i < rows; i++) {
         string line = "";
         for (int j = 0; j < cols; j++) {
