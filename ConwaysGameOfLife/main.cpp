@@ -15,7 +15,7 @@ using namespace std;
  * 3. 分析并优化updateGrid()的效率
  * 4. 添加二叉搜索树
  * 5. 实现自动化和pattern识别算法
- *
+ * 6. 每个方法不超过15行
  */
 
 
