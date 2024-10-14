@@ -20,20 +20,20 @@ using namespace std;
 
 
 // Function to display the grid with each cell represented as a space surrounded by four dots
+// displayGrid额外处理了显示输出的逻辑，Grid中的数据存储无需关注输出的格式
 void displayGrid(const vector<vector<bool>>& grid) {
     int rows = grid.size();
     int cols = grid[0].size();
 
-    for (int i = 0; i < rows + 1; i++) {
-        for (int j = 0; j < cols + 1; j++) {
-            if (i == 0) {
-                cout << ". ";
-            } else if (j == 0) {
-                cout << ".";
-            }
-            else {
-                cout << (grid[i][j] ? "O." : " .");  // Alive or Dead with a space
-            }
+    for (int i = 0; i < cols; i++) {
+        cout << ". ";
+    }
+    cout << "." << endl;
+
+    for (int i = 0; i < rows; i++) {
+        cout << ".";
+        for (int j = 0; j < cols; j++) {
+            cout << (grid[i][j] ? "O." : " .");
         }
         cout << endl;
     }
