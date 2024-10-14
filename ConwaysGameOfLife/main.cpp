@@ -96,7 +96,6 @@ void initializeGrid(vector<vector<bool>>& grid, int aliveCount) {
 }
 
 // Function to save the current grid state to a file
-// todo: problem when saving
 bool saveGridToFile(const string& filename, const vector<vector<bool>>& grid, int currentStep) {
     ofstream outFile(filename);
     if (!outFile) {
@@ -122,14 +121,17 @@ bool saveGridToFile(const string& filename, const vector<vector<bool>>& grid, in
     // Write current step
     outFile << currentStep << endl;
 
+    string line = "";
+    for (int i = 0; i < cols; i++) {
+        line += ". ";
+    }
+    line += ".";
+    outFile << line << endl;
+
     for (int i = 0; i < rows; i++) {
-        string line = "";
+        line = ".";
         for (int j = 0; j < cols; j++) {
-            if (i == 0 || i == rows - 1 || j == 0 || j == cols - 1) {
-                line += ". ";
-            } else {
-                line += (grid[i][j] ? "O " : ". ");
-            }
+            line += (grid[i][j] ? "O." : " .");
         }
         outFile << line << endl;
     }
@@ -140,6 +142,7 @@ bool saveGridToFile(const string& filename, const vector<vector<bool>>& grid, in
 }
 
 // Function to load the grid state from a file
+// todo: might be problems when loading from file
 bool loadGridFromFile(const string& filename, vector<vector<bool> >& grid, int& currentStep) {
     ifstream inFile(filename);
     if (!inFile) {
@@ -358,6 +361,6 @@ int main() {
 /*
  * Run in terminal window:
  * cd "/Users/libangyu/Dev/csc8501coursework/conwaysgameoflife"
- * lang++ -std=c++17 -o gameoflife main.cpp
+ * clang++ -std=c++17 -o gameoflife main.cpp
  * ./gameoflife
  */
