@@ -6,6 +6,19 @@
 
 using namespace std;
 
+
+/*
+ * How to find dynamic patterns:
+ * load initial match grid and try to find a matched pattern
+ * if found, load next frame of pattern to the match grind,
+ * continue to detect if following frames match
+ *
+ * todo: maybe matrix transformation for matching
+ * patterns in different orientations
+ */
+
+// bool loadPatternSequenceFromFile(const string& fileName) {}
+
 // Function to load pattern from file
 bool loadPattern(const string& filename, vector<vector<bool>>& pattern) {
     ifstream file(filename);
@@ -19,6 +32,16 @@ bool loadPattern(const string& filename, vector<vector<bool>>& pattern) {
 
     int rows, cols;
     file >> rows >> cols;
+    file >> ws; // Consume newline
+
+    // pattern包含的序列数
+    int steps;
+    file >> steps;
+    file >> ws; // Consume newline
+
+    // 当前的pattern序列index
+    int sequenceIndex;
+    file >> sequenceIndex;
     file >> ws; // Consume newline
 
     pattern.clear();
@@ -38,7 +61,7 @@ bool loadPattern(const string& filename, vector<vector<bool>>& pattern) {
     return !pattern.empty();
 }
 
-// Function to find pattern in grid
+// Function to find pattern in grid in single frame
 bool findPattern(const Grid& grid, const vector<vector<bool>>& pattern, int& row, int& col) {
     int gridRows = grid.getRows();
     int gridCols = grid.getCols();
@@ -95,7 +118,6 @@ int main() {
         cout << "Enter the number of steps: ";
         cin >> steps;
 
-        // Validate inputs
         if (rows < 3 || cols < 3) {
             cout << "Grid size must be at least 3x3." << endl;
             return 1;
