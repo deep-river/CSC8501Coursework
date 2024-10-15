@@ -10,4 +10,7 @@ add_executable(CSC8501Coursework main.cpp
         passing_parameters.cpp
         interaction_and_recursion.cpp
         arrays.cpp
-        ConwaysGameOfLife/main.cpp)
+        ConwaysGameOfLife/main.cpp
+        ConwaysGameOfLife/grid.h
+        ConwaysGameOfLife/grid.cpp
+)

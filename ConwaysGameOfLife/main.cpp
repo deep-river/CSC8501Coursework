@@ -1,258 +1,96 @@
 #include <iostream>
-#include <vector>
-#include <cstdlib>
-#include <ctime>
-#include <fstream>
 #include <string>
-#include <sstream>
+#include <fstream>
+#include <vector>
+#include "grid.h"
 
 using namespace std;
 
-
-/* todo:
- * 1. 尝试用类或者面向对象(类，继承，多态，模版)的形式存储grid
- * 2. 用类表示grid
- * 3. 分析并优化updateGrid()的效率
- * 4. 添加二叉搜索树
- * 5. 实现自动化和pattern识别算法
- * 6. 每个方法不超过15行
- */
-
-
-// Function to display the grid with each cell represented as a space surrounded by four dots
-// displayGrid额外处理了显示输出的逻辑，Grid中的数据存储无需关注输出的格式
-void displayGrid(const vector<vector<bool>>& grid) {
-    int rows = grid.size();
-    int cols = grid[0].size();
-
-    for (int i = 0; i < cols; i++) {
-        cout << ". ";
-    }
-    cout << "." << endl;
-
-    for (int i = 0; i < rows; i++) {
-        cout << ".";
-        for (int j = 0; j < cols; j++) {
-            cout << (grid[i][j] ? "O." : " .");
-        }
-        cout << endl;
-    }
-}
-
-// Function to count the alive neighbors of a cell
-int countAliveNeighbors(const vector<vector<bool>>& grid, int x, int y) {
-    int aliveNeighbors = 0;
-    int rows = grid.size();
-    int cols = grid[0].size();
-
-    for (int i = -1; i <= 1; i++) {
-        for (int j = -1; j <= 1; j++) {
-            if (i == 0 && j == 0) continue;  // Skip the cell itself
-            int nx = x + i;
-            int ny = y + j;
-            if (nx >= 0 && nx < rows && ny >= 0 && ny < cols) {
-                aliveNeighbors += grid[nx][ny];
-            }
-        }
-    }
-    return aliveNeighbors;
-}
-
-// Function to update the grid
-vector<vector<bool>> updateGrid(const vector<vector<bool>>& grid) {
-    int rows = grid.size();
-    int cols = grid[0].size();
-    vector<vector<bool>> newGrid(rows, vector<bool>(cols, false));
-
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            int aliveNeighbors = countAliveNeighbors(grid, i, j);
-            if (grid[i][j] && (aliveNeighbors == 2 || aliveNeighbors == 3)) {
-                newGrid[i][j] = true;  // Survival
-            } else if (!grid[i][j] && aliveNeighbors == 3) {
-                newGrid[i][j] = true;  // Birth
-            } else {
-                newGrid[i][j] = false;  // Death
-            }
-        }
-    }
-    return newGrid;
-}
-
-// Function to initialize the grid with random alive cells
-void initializeGrid(vector<vector<bool>>& grid, int aliveCount) {
-    const int rows = grid.size();
-    const int cols = grid[0].size();
-    int placed = 0;
-
-    while (placed < aliveCount) {
-        int x = rand() % rows;
-        int y = rand() % cols;
-        if (!grid[x][y]) {
-            grid[x][y] = true;
-            placed++;
-        }
-    }
-}
-
-// Function to save the current grid state to a file
-bool saveGridToFile(const string& filename, const vector<vector<bool>>& grid, int currentStep) {
-    ofstream outFile(filename);
-    if (!outFile) {
-        cerr << "Error: Unable to open file for saving." << endl;
+// Function to load pattern from file
+bool loadPattern(const string& filename, vector<vector<bool>>& pattern) {
+    ifstream file(filename);
+    if (!file.is_open()) {
+        cerr << "Error: Unable to open file " << filename << endl;
         return false;
     }
 
-    int rows = grid.size();
-    int cols = grid[0].size();
-    int aliveCount = 0;
-
-    // Count alive cells
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            if (grid[i][j]) aliveCount++;
-        }
-    }
-
-    // Write grid size
-    outFile << rows << " " << cols << endl;
-    // Write alive count
-    outFile << aliveCount << endl;
-    // Write current step
-    outFile << currentStep << endl;
-
-    string line = "";
-    for (int i = 0; i < cols; i++) {
-        line += ". ";
-    }
-    line += ".";
-    outFile << line << endl;
-
-    for (int i = 0; i < rows; i++) {
-        line = ".";
-        for (int j = 0; j < cols; j++) {
-            line += (grid[i][j] ? "O." : " .");
-        }
-        outFile << line << endl;
-    }
-
-    outFile.close();
-    cout << "Grid saved successfully to " << filename << endl;
-    return true;
-}
-
-// Function to load the grid state from a file
-// todo: might be problems when loading from file
-/**
- * @brief 从文件中加载游戏网格
- *
- * @param filename 文件名
- * @param grid 网格二维布尔向量
- * @param currentStep 当前步骤数
- * @return true 加载成功
- * @return false 加载失败
- */
-bool loadGridFromFile(const string& filename, vector<vector<bool>>& grid, int& currentStep) {
-    // 打开文件
-    ifstream inFile(filename);
-    if (!inFile) {
-        cerr << "Error: Unable to open file for loading." << endl;
-        return false;
-    }
-
-    int rows, cols, aliveCount;
     string line;
+    getline(file, line); // Skip the [pattern] line
 
-    // 读取网格行数和列数
-    if (!(inFile >> rows >> cols)) {
-        cerr << "Error: Invalid file format (grid size)." << endl;
-        return false;
-    }
+    int rows, cols;
+    file >> rows >> cols;
+    file >> ws; // Consume newline
 
-    // 读取存活细胞数量
-    if (!(inFile >> aliveCount)) {
-        cerr << "Error: Invalid file format (alive count)." << endl;
-        return false;
-    }
+    int aliveCount;
+    file >> aliveCount;
+    file >> ws; // Consume newline
 
-    // 读取当前步骤数
-    if (!(inFile >> currentStep)) {
-        cerr << "Error: Invalid file format (current step)." << endl;
-        return false;
-    }
+    int version;
+    file >> version;
+    file >> ws; // Consume newline
 
-    // 初始化网格，全部设为死亡
-    grid.assign(rows, vector<bool>(cols, false));
+    pattern.clear();
+    pattern.resize(rows, vector<bool>(cols, false));
 
-    // 读取网格状态
-    getline(inFile, line); // 消耗当前行的剩余换行符
-    getline(inFile, line); // 消耗当前行的剩余换行符
-    for (int i = 0; i < rows; i++) {
-        if (!getline(inFile, line)) {
-            cerr << "Error: Incomplete grid data." << endl;
-            return false;
+    for (int i = 0; i < rows; ++i) {
+        getline(file, line);
+        int col = 0;
+        for (size_t j = 1; j < line.length(); j += 2) {
+            if (col >= cols) break;
+            pattern[i][col] = (line[j] == 'O');
+            ++col;
         }
+    }
 
-        // 输出当前读取的行内容，便于调试
-        // cout << "Reading row " << i + 1 << ": " << line << endl;
+    file.close();
+    return !pattern.empty();
+}
 
-        int j = 0; // 列索引
-        for (char ch : line) {
-            if (ch == '.') {
-                continue; // 忽略分隔符和边界的点
-            }
-            if (ch == 'O') {
-                if (j < cols) {
-                    grid[i][j] = true; // 存活
-                    j++;
-                } else {
-                    cerr << "Error: Too many cells in row " << i + 1 << "." << endl;
-                    return false;
+// Function to find pattern in grid
+bool findPattern(const Grid& grid, const vector<vector<bool>>& pattern, int& row, int& col) {
+    int gridRows = grid.getRows();
+    int gridCols = grid.getCols();
+    int patternRows = pattern.size();
+    int patternCols = pattern[0].size();
+
+    for (int i = 0; i <= gridRows - patternRows; ++i) {
+        for (int j = 0; j <= gridCols - patternCols; ++j) {
+            bool match = true;
+            for (int pi = 0; pi < patternRows && match; ++pi) {
+                for (int pj = 0; pj < patternCols && match; ++pj) {
+                    if (pattern[pi][pj] != grid.getState()[i + pi][j + pj]) {
+                        match = false;
+                    }
                 }
             }
-            else if (ch == ' ') {
-                if (j < cols) {
-                    grid[i][j] = false; // 死亡
-                    j++;
-                } else {
-                    cerr << "Error: Too many cells in row " << i + 1 << "." << endl;
-                    return false;
-                }
+            if (match) {
+                row = i;
+                col = j;
+                return true;
             }
-            else {
-                // 处理其他可能的字符
-                cerr << "Error: Invalid character '" << ch << "' in grid data at row " << i + 1 << ", column " << j + 1 << "." << endl;
-                return false;
-            }
-        }
-
-        if (j < cols) {
-            cerr << "Error: Not enough cells in row " << i + 1 << "." << endl;
-            return false;
         }
     }
-
-    inFile.close();
-    cout << "Grid loaded successfully from " << filename << endl;
-    return true;
+    return false;
 }
 
 int main() {
     srand(static_cast<unsigned int>(time(0)));  // Seed the random number generator
 
-    int rows, cols, aliveCount, steps, lifePattern;
-    vector<vector<bool>> grid;
+    int rows, cols, aliveCount, steps;
     int currentStep = 0;
 
     // Initial choice: new simulation or load from file
     cout << "Conway's Game of Life Simulation\n";
     cout << "---------------------------------\n";
     cout << "1. Start a new simulation\n";
-    cout << "2. Load simulation from file\n";;
-    cout << "3. Run until find a life\n";
+    cout << "2. Load simulation from file\n";
+    cout << "3. Run until find a life pattern\n";
     cout << "Enter your choice (1 - 3): ";
     int choice;
     cin >> choice;
+
+    Grid* grid = nullptr;
+    vector<vector<bool>> pattern;
 
     if (choice == 1) {
         // Input for grid size, number of alive cells, and steps
@@ -279,17 +117,14 @@ int main() {
             return 1;
         }
 
-        // Create the grid
-        grid.assign(rows, vector<bool>(cols, false));
-        cout << "Grid assigned" << endl;
-
-        // Initialize grid with random alive cells
-        initializeGrid(grid, aliveCount);
+        // Create and initialize the grid
+        grid = new Grid(rows, cols);
+        grid->initialize(aliveCount);
         cout << "Grid initialized" << endl;
 
         // Display initial grid
         cout << "\nInitial grid:\n";
-        displayGrid(grid);
+        cout << grid->toString();
     }
     else if (choice == 2) {
         // Load from file
@@ -297,7 +132,9 @@ int main() {
         cout << "Enter the filename to load: ";
         cin >> filename;
 
-        if (!loadGridFromFile(filename, grid, currentStep)) {
+        grid = new Grid(1, 1);  // Temporary grid, will be resized when loading
+        if (!grid->loadFromFile(filename, currentStep)) {
+            delete grid;
             return 1;  // Exit if loading fails
         }
 
@@ -307,20 +144,33 @@ int main() {
 
         // Display loaded grid
         cout << "\nLoaded grid (Step " << currentStep << "):\n";
-        displayGrid(grid);
+        cout << grid->toString();
     }
     else if (choice == 3) {
-        cout << "Choose a life pattern: ";
-        cin >> lifePattern;
-        cout << "Enter the number of rows (minimum 3): ";
+        cout << "Enter the number of rows (minimum 30): ";
         cin >> rows;
-        cout << "Enter the number of columns (minimum 3): ";
+        cout << "Enter the number of columns (minimum 30): ";
         cin >> cols;
-        cout << "Enter the number of alive cells: ";
+        cout << "Enter the number of alive cells (minimum 25): ";
         cin >> aliveCount;
-        cout << "Enter the number of steps: ";
-        cin >> steps;
-        // todo: pattern matching
+
+        if (rows < 30 || cols < 30 || aliveCount < 25) {
+            cout << "Invalid input. Grid size must be at least 30x30 and alive cells at least 25." << endl;
+            return 1;
+        }
+
+        grid = new Grid(rows, cols);
+        grid->initialize(aliveCount);
+        steps = 1000;  // Set a large number of steps for pattern finding
+
+        // Load pattern
+        string patternFilename;
+        cout << "Enter the filename of the pattern to find: ";
+        cin >> patternFilename;
+        if (!loadPattern(patternFilename, pattern)) {
+            delete grid;
+            return 1;  // Exit if pattern loading fails
+        }
     }
     else {
         cout << "Invalid choice. Exiting." << endl;
@@ -328,75 +178,104 @@ int main() {
     }
 
     // Simulation loop
-    for (int step = 0; step < steps; step++) {
+    bool patternFound = false;
+    for (int step = 0; step < steps && !patternFound; step++) {
         // Update grid
-        grid = updateGrid(grid);
+        grid->update();
         currentStep++;
 
         // Display current step
         cout << "\nStep " << currentStep << ":\n";
-        displayGrid(grid);
+        cout << grid->toString();
+
+        // Check for patterns if in pattern finding mode
+        if (choice == 3) {
+            int row, col;
+            if (findPattern(*grid, pattern, row, col)) {
+                cout << "Pattern found at position (" << row << ", " << col << ")" << endl;
+                patternFound = true;
+                break;
+            }
+        }
 
         // Prompt user for action
-        cout << "\nChoose an action:\n";
-        cout << "1. Continue to next step\n";
-        cout << "2. Save and exit\n";
-        cout << "3. Load from file\n";
-        cout << "4. Exit without saving\n";
-        cout << "Enter your choice (1-4): ";
-        int action;
-        cin >> action;
+        if (choice != 3) {
+            cout << "\nChoose an action:\n";
+            cout << "1. Continue to next step\n";
+            cout << "2. Save and exit\n";
+            cout << "3. Load from file\n";
+            cout << "4. Exit without saving\n";
+            cout << "Enter your choice (1-4): ";
+            int action;
+            cin >> action;
 
-        if (action == 1) {
-            continue;  // Proceed to next step
-        }
-        else if (action == 2) {
-            // Save and exit
-            string saveFilename;
-            cout << "Enter filename to save the current grid: ";
-            cin >> saveFilename;
-            if (saveGridToFile(saveFilename, grid, currentStep)) {
-                cout << "Simulation saved. Exiting." << endl;
+            if (action == 1) {
+                continue;  // Proceed to next step
+            }
+            else if (action == 2) {
+                // Save and exit
+                string saveFilename;
+                cout << "Enter filename to save the current grid: ";
+                cin >> saveFilename;
+                if (grid->saveToFile(saveFilename, currentStep)) {
+                    cout << "Simulation saved. Exiting." << endl;
+                    delete grid;
+                    return 0;
+                }
+                else {
+                    cout << "Failed to save. Continuing simulation." << endl;
+                }
+            }
+            else if (action == 3) {
+                // Load from file
+                string loadFilename;
+                cout << "Enter filename to load the grid: ";
+                cin >> loadFilename;
+                Grid* newGrid = new Grid(1, 1);  // Temporary grid, will be resized when loading
+                if (newGrid->loadFromFile(loadFilename, currentStep)) {
+                    delete grid;
+                    grid = newGrid;
+                    // Display loaded grid
+                    cout << "\nLoaded grid (Step " << currentStep << "):\n";
+                    cout << grid->toString();
+                    // Adjust remaining steps if desired
+                }
+                else {
+                    cout << "Failed to load. Continuing simulation." << endl;
+                    delete newGrid;
+                }
+            }
+            else if (action == 4) {
+                // Exit without saving
+                cout << "Exiting without saving." << endl;
+                delete grid;
                 return 0;
             }
             else {
-                cout << "Failed to save. Continuing simulation." << endl;
+                cout << "Invalid action. Continuing simulation." << endl;
             }
-        }
-        else if (action == 3) {
-            // Load from file
-            string loadFilename;
-            cout << "Enter filename to load the grid: ";
-            cin >> loadFilename;
-            if (loadGridFromFile(loadFilename, grid, currentStep)) {
-                // Display loaded grid
-                cout << "\nLoaded grid (Step " << currentStep << "):\n";
-                displayGrid(grid);
-                // Adjust remaining steps if desired
-            }
-            else {
-                cout << "Failed to load. Continuing simulation." << endl;
-            }
-        }
-        else if (action == 4) {
-            // Exit without saving
-            cout << "Exiting without saving." << endl;
-            return 0;
-        }
-        else {
-            cout << "Invalid action. Continuing simulation." << endl;
         }
     }
 
-    cout << "\nSimulation completed." << endl;
+    if (choice == 3 && !patternFound) {
+        cout << "Pattern not found within " << steps << " steps." << endl;
+    } else if (choice != 3) {
+        cout << "\nSimulation completed." << endl;
+    }
+
+    delete grid;
     return 0;
 }
 
 
-
 /*
  * Run in terminal window:
+ * 
  * cd "/Users/libangyu/Dev/csc8501coursework/conwaysgameoflife"
+ *
  * clang++ -std=c++17 -o gameoflife main.cpp
+ * or
+ * clang++ -std=c++17 -o gameoflife main.cpp grid.cpp
+ *
  * ./gameoflife
  */
