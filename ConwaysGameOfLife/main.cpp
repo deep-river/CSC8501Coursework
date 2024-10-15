@@ -287,8 +287,6 @@ int main() {
  *
  * cd "/Users/libangyu/Dev/csc8501coursework/conwaysgameoflife"
  *
- * clang++ -std=c++17 -o gameoflife main.cpp
- * or
  * clang++ -std=c++17 -o gameoflife main.cpp grid.cpp
  *
  * ./gameoflife
