@@ -244,19 +244,11 @@ int main() {
             grid->initialize(aliveCount);
             currentStep = 0;
 
-            // Output initial grid
-            cout << "\nInitial grid for experiment #" << experimentCount << ":\n";
-            cout << grid->toString();
-
             // Simulation loop
             for (int step = 0; step < steps && !patternFound; step++) {
                 // Update grid
                 grid->update();
                 currentStep++;
-
-                // Output current grid
-                cout << "\nStep " << currentStep << " for experiment #" << experimentCount << ":\n";
-                cout << grid->toString();
 
                 // Check for patterns
                 int row, col, patternIndex;
