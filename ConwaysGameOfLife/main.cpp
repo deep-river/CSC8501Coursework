@@ -9,19 +9,45 @@
 
 using namespace std;
 
+
 // Function to rotate a pattern 90 degrees clockwise
 vector<vector<bool>> rotatePattern(const vector<vector<bool>>& pattern) {
     int rows = pattern.size();
     int cols = pattern[0].size();
-    vector<vector<bool>> rotated(cols, vector<bool>(rows));
+    vector<vector<bool>> rotated(cols, vector<bool>(rows, false));
+
+    // Find the bounding box of the live cells
+    int minRow = rows, maxRow = 0, minCol = cols, maxCol = 0;
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
-            rotated[j][rows - 1 - i] = pattern[i][j];
+            if (pattern[i][j]) {
+                minRow = min(minRow, i);
+                maxRow = max(maxRow, i);
+                minCol = min(minCol, j);
+                maxCol = max(maxCol, j);
+            }
         }
     }
+
+    // Add padding around the bounding box
+    minRow = max(0, minRow - 1);
+    maxRow = min(rows - 1, maxRow + 1);
+    minCol = max(0, minCol - 1);
+    maxCol = min(cols - 1, maxCol + 1);
+
+    // Rotate the pattern within the padded bounding box
+    for (int i = minRow; i <= maxRow; ++i) {
+        for (int j = minCol; j <= maxCol; ++j) {
+            int newCol = rows - 1 - i;
+            int newRow = j;
+            rotated[newRow][newCol] = pattern[i][j];
+        }
+    }
+
     return rotated;
 }
 
+// todo: 用operator overloading重写方法
 // Function to check if two patterns are different
 bool patternsAreDifferent(const vector<vector<bool>>& p1, const vector<vector<bool>>& p2) {
     if (p1.size() != p2.size() || p1[0].size() != p2[0].size()) return true;
@@ -60,11 +86,8 @@ bool loadPattern(const string& filename, vector<vector<vector<bool>>>& patterns)
 
     for (int i = 0; i < rows; ++i) {
         getline(file, line);
-        int col = 0;
-        for (size_t j = 1; j < line.length(); j += 2) {
-            if (col >= cols) break;
-            pattern[i][col] = (line[j] == 'O');
-            ++col;
+        for (int j = 0; j < cols; ++j) {
+            pattern[i][j] = (line[j * 2 + 1] == 'O');
         }
     }
 
@@ -131,6 +154,8 @@ bool saveExperiment(const Grid& grid, const string& patternName, int currentStep
     return grid.saveToFile(filename, currentStep);
 }
 
+
+// todo: 记录初始grid的state或随机种子，在发现匹配pattern后保存文件时记录初始状态和最终状态，以便实验重现
 int main() {
     srand(static_cast<unsigned int>(time(0)));  // Seed the random number generator
 
