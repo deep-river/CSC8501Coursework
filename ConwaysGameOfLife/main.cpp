@@ -9,6 +9,13 @@
 
 using namespace std;
 
+/*
+ * todo:
+ * 1. OOP - pattern继承grid类
+ * 2. 用运算符重载重写patternsAreDifferent
+ * 3. pattern或grid的cell可以存储多种数据类型，构成多态、模版
+ * 4. 优化Commandline ui
+ */
 
 // Function to rotate a pattern 90 degrees clockwise
 vector<vector<bool>> rotatePattern(const vector<vector<bool>>& pattern) {
