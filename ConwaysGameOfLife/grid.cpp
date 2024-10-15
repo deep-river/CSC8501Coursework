@@ -104,10 +104,12 @@ bool Grid::loadFromFile(const std::string& filename, int& currentStep) {
     int fileRows, fileCols, aliveCount;
     inFile >> fileRows >> fileCols >> aliveCount >> currentStep;
 
-    if (fileRows != rows || fileCols != cols) {
+    /*if (fileRows != rows || fileCols != cols) {
         std::cerr << "Error: Grid size mismatch." << std::endl;
         return false;
-    }
+    }*/
+    rows =  fileRows;
+    cols = fileCols;
 
     cells.assign(rows, std::vector<bool>(cols, false));
 

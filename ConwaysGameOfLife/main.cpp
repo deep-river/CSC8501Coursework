@@ -21,14 +21,6 @@ bool loadPattern(const string& filename, vector<vector<bool>>& pattern) {
     file >> rows >> cols;
     file >> ws; // Consume newline
 
-    int aliveCount;
-    file >> aliveCount;
-    file >> ws; // Consume newline
-
-    int version;
-    file >> version;
-    file >> ws; // Consume newline
-
     pattern.clear();
     pattern.resize(rows, vector<bool>(cols, false));
 
@@ -270,7 +262,7 @@ int main() {
 
 /*
  * Run in terminal window:
- * 
+ *
  * cd "/Users/libangyu/Dev/csc8501coursework/conwaysgameoflife"
  *
  * clang++ -std=c++17 -o gameoflife main.cpp
