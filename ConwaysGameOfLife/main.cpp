@@ -158,7 +158,7 @@ string getCurrentDateTime() {
 // Function to save experiment to file
 bool saveExperiment(const Grid& grid, const string& patternName, int currentStep) {
     string filename = getCurrentDateTime() + "-" + patternName + "-" + to_string(currentStep) + ".txt";
-    return grid.saveToFile(filename, currentStep);
+    return grid.saveExperiment(filename, 0, grid.getInitialState());
 }
 
 
@@ -238,15 +238,15 @@ int main() {
         cout << grid->toString();
     }
     else if (choice == 3) {
-        cout << "Enter the number of rows (minimum 30): ";
+        cout << "Enter the number of rows (minimum 3, greater than 30 for Q2, Q3, Q4): ";
         cin >> rows;
-        cout << "Enter the number of columns (minimum 30): ";
+        cout << "Enter the number of columns (minimum 3, greater than 30 for Q2, Q3, Q4): ";
         cin >> cols;
-        cout << "Enter the number of alive cells (minimum 25): ";
+        cout << "Enter the number of alive cells (minimum 1): ";
         cin >> aliveCount;
 
-        if (rows < 30 || cols < 30 || aliveCount < 25) {
-            cout << "Invalid input. Grid size must be at least 30x30 and alive cells at least 25." << endl;
+        if (rows < 3 || cols < 3 || aliveCount < 0 || aliveCount > rows * cols) {
+            cout << "Invalid input. Grid size must be at least 3x3 and alive cells at least 1." << endl;
             return 1;
         }
 

@@ -19,6 +19,9 @@ void Grid::initialize(int aliveCount) {
             placed++;
         }
     }
+
+    // Store the initial state
+    initialState = cells;
 }
 
 void Grid::update() {
@@ -68,6 +71,60 @@ std::string Grid::toString() const {
         result += "\n";
     }
     return result;
+}
+
+std::string Grid::toString(std::vector<std::vector<bool>> printGrid) const {
+    std::string result;
+    for (int i = 0; i < cols; i++) {
+        result += ". ";
+    }
+    result += ".\n";
+
+    for (int i = 0; i < rows; i++) {
+        result += ".";
+        for (int j = 0; j < cols; j++) {
+            result += printGrid[i][j] ? "O." : " .";
+        }
+        result += "\n";
+    }
+    return result;
+}
+
+bool Grid::saveExperiment(const std::string& filename, int currentStep, const std::vector<std::vector<bool>>& initialState) const {
+    std::ofstream outFile(filename);
+    if (!outFile) {
+        std::cerr << "Error: Unable to open file for saving." << std::endl;
+        return false;
+    }
+
+    int aliveCount = 0;
+    for (const auto& row : cells) {
+        for (bool cell : row) {
+            if (cell) aliveCount++;
+        }
+    }
+
+    outFile << rows << " " << cols << std::endl;
+    outFile << aliveCount << std::endl;
+    outFile << currentStep << std::endl;
+
+    // Save initial state
+    /*outFile << "Initial State:" << std::endl;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            outFile << (initialState[i][j] ? "O" : ".");
+        }
+        outFile << std::endl;
+    }*/
+    outFile << toString(initialState) << std::endl;
+
+    // Save final state
+    outFile << "Final State:" << std::endl;
+    outFile << toString(cells);
+
+    outFile.close();
+    std::cout << "Experiment saved successfully to " << filename << std::endl;
+    return true;
 }
 
 bool Grid::saveToFile(const std::string& filename, int currentStep) const {
