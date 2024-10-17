@@ -12,5 +12,5 @@ add_executable(CSC8501Coursework main.cpp
         arrays.cpp
         ConwaysGameOfLife/main.cpp
         ConwaysGameOfLife/grid.h
-        ConwaysGameOfLife/grid.cpp
+        ConwaysGameOfLife/grid.tpp
 )

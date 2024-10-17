@@ -9,14 +9,6 @@
 
 using namespace std;
 
-/*
- * todo:
- * 1. OOP - pattern继承grid类
- * 2. 用运算符重载重写patternsAreDifferent
- * 3. pattern或grid的cell可以存储多种数据类型，构成多态、模版
- * 4. 优化Commandline ui
- */
-
 // Function to rotate a pattern 90 degrees clockwise
 vector<vector<bool>> rotatePattern(const vector<vector<bool>>& pattern) {
     int rows = pattern.size();
@@ -54,9 +46,8 @@ vector<vector<bool>> rotatePattern(const vector<vector<bool>>& pattern) {
     return rotated;
 }
 
-// todo: 用operator overloading重写方法
-// Function to check if two patterns are different
-bool patternsAreDifferent(const vector<vector<bool>>& p1, const vector<vector<bool>>& p2) {
+// Overload operator != to check if two patterns are different
+bool operator!=(const vector<vector<bool>>& p1, const vector<vector<bool>>& p2) {
     if (p1.size() != p2.size() || p1[0].size() != p2[0].size()) return true;
     for (size_t i = 0; i < p1.size(); ++i) {
         for (size_t j = 0; j < p1[0].size(); ++j) {
@@ -106,7 +97,7 @@ bool loadPattern(const string& filename, vector<vector<vector<bool>>>& patterns)
     // Add rotated patterns
     for (int i = 1; i <= 3; ++i) {
         vector<vector<bool>> rotated = rotatePattern(patterns.back());
-        if (patternsAreDifferent(rotated, pattern)) {
+        if (rotated != pattern) {
             patterns.push_back(rotated);
         }
     }
@@ -115,7 +106,8 @@ bool loadPattern(const string& filename, vector<vector<vector<bool>>>& patterns)
 }
 
 // Function to find pattern in grid
-bool findPattern(const Grid& grid, const vector<vector<vector<bool>>>& patterns, int& row, int& col, int& patternIndex) {
+bool findPattern(const Grid<bool>& grid, const vector<vector<vector<bool>>>& patterns, int& row, int& col, int&
+patternIndex) {
     int gridRows = grid.getRows();
     int gridCols = grid.getCols();
     const auto& originalState = grid.getState();
@@ -165,13 +157,12 @@ string getCurrentDateTime() {
 }
 
 // Function to save experiment to file
-bool saveExperiment(const Grid& grid, const string& patternName, int currentStep) {
+bool saveExperiment(const Grid<bool>& grid, const string& patternName, int currentStep) {
     string filename = getCurrentDateTime() + "-" + patternName + "-" + to_string(currentStep) + ".txt";
     return grid.saveExperiment(filename, 0, grid.getInitialState());
 }
 
 
-// todo: 记录初始grid的state或随机种子，在发现匹配pattern后保存文件时记录初始状态和最终状态，以便实验重现
 int main() {
     srand(static_cast<unsigned int>(time(0)));  // Seed the random number generator
 
@@ -188,7 +179,7 @@ int main() {
     int choice;
     cin >> choice;
 
-    Grid* grid = nullptr;
+    Grid<bool>* grid = nullptr;
     vector<vector<vector<bool>>> patterns;
     string patternName;
 
@@ -218,7 +209,7 @@ int main() {
         }
 
         // Create and initialize the grid
-        grid = new Grid(rows, cols);
+        grid = new Grid<bool>(rows, cols);
         grid->initialize(aliveCount);
         cout << "Grid initialized" << endl;
 
@@ -232,7 +223,7 @@ int main() {
         cout << "Enter the filename to load: ";
         cin >> filename;
 
-        grid = new Grid(1, 1);  // Temporary grid, will be resized when loading
+        grid = new Grid<bool>(1, 1);   // will be resized when loading
         if (!grid->loadFromFile(filename, currentStep)) {
             delete grid;
             return 1;  // Exit if loading fails
@@ -281,7 +272,7 @@ int main() {
             experimentCount++;
             cout << "\nStarting experiment #" << experimentCount << endl;
 
-            grid = new Grid(rows, cols);
+            grid = new Grid<bool>(rows, cols);
             grid->initialize(aliveCount);
             currentStep = 0;
 
@@ -382,7 +373,7 @@ int main() {
                 string loadFilename;
                 cout << "Enter filename to load the grid: ";
                 cin >> loadFilename;
-                Grid* newGrid = new Grid(1, 1);  // Temporary grid, will be resized when loading
+                Grid<bool>* newGrid = new Grid<bool>(1, 1);  // Temporary grid, will be resized when loading
                 if (newGrid->loadFromFile(loadFilename, currentStep)) {
                     delete grid;
                     grid = newGrid;
