@@ -24,6 +24,6 @@ private:
     std::vector<std::vector<bool>> cells;
     std::vector<std::vector<bool>> initialState;
     int rows, cols;
-
+    int initialAliveCount;
     int countAliveNeighbors(int row, int col) const;
 };

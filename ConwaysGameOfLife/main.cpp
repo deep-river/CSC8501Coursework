@@ -118,25 +118,34 @@ bool loadPattern(const string& filename, vector<vector<vector<bool>>>& patterns)
 bool findPattern(const Grid& grid, const vector<vector<vector<bool>>>& patterns, int& row, int& col, int& patternIndex) {
     int gridRows = grid.getRows();
     int gridCols = grid.getCols();
+    const auto& originalState = grid.getState();
+
+    // Create a padded grid
+    vector<vector<bool>> paddedGrid(gridRows + 2, vector<bool>(gridCols + 2, false));
+    for (int i = 0; i < gridRows; ++i) {
+        for (int j = 0; j < gridCols; ++j) {
+            paddedGrid[i + 1][j + 1] = originalState[i][j];
+        }
+    }
 
     for (size_t p = 0; p < patterns.size(); ++p) {
         const auto& pattern = patterns[p];
         int patternRows = pattern.size();
         int patternCols = pattern[0].size();
 
-        for (int i = 0; i <= gridRows - patternRows; ++i) {
-            for (int j = 0; j <= gridCols - patternCols; ++j) {
+        for (int i = 0; i <= gridRows + 2 - patternRows; ++i) {
+            for (int j = 0; j <= gridCols + 2 - patternCols; ++j) {
                 bool match = true;
                 for (int pi = 0; pi < patternRows && match; ++pi) {
                     for (int pj = 0; pj < patternCols && match; ++pj) {
-                        if (pattern[pi][pj] != grid.getState()[i + pi][j + pj]) {
+                        if (pattern[pi][pj] != paddedGrid[i + pi][j + pj]) {
                             match = false;
                         }
                     }
                 }
                 if (match) {
-                    row = i;
-                    col = j;
+                    row = i - 1;  // Adjust for padding
+                    col = j - 1;  // Adjust for padding
                     patternIndex = p;
                     return true;
                 }
@@ -185,9 +194,9 @@ int main() {
 
     if (choice == 1) {
         // Input for grid size, number of alive cells, and steps
-        cout << "Enter the number of rows (minimum 3): ";
+        cout << "Enter the number of rows (minimum 2): ";
         cin >> rows;
-        cout << "Enter the number of columns (minimum 3): ";
+        cout << "Enter the number of columns (minimum 2): ";
         cin >> cols;
         cout << "Enter the number of alive cells: ";
         cin >> aliveCount;
@@ -195,7 +204,7 @@ int main() {
         cin >> steps;
 
         // Validate inputs
-        if (rows < 3 || cols < 3) {
+        if (rows < 2 || cols < 2) {
             cout << "Grid size must be at least 3x3." << endl;
             return 1;
         }
@@ -238,14 +247,14 @@ int main() {
         cout << grid->toString();
     }
     else if (choice == 3) {
-        cout << "Enter the number of rows (minimum 3, greater than 30 for Q2, Q3, Q4): ";
+        cout << "Enter the number of rows (minimum 2, greater than 30 for Q2, Q3, Q4): ";
         cin >> rows;
-        cout << "Enter the number of columns (minimum 3, greater than 30 for Q2, Q3, Q4): ";
+        cout << "Enter the number of columns (minimum 2, greater than 30 for Q2, Q3, Q4): ";
         cin >> cols;
         cout << "Enter the number of alive cells (minimum 1): ";
         cin >> aliveCount;
 
-        if (rows < 3 || cols < 3 || aliveCount < 0 || aliveCount > rows * cols) {
+        if (rows < 2 || cols < 2 || aliveCount < 0 || aliveCount > rows * cols) {
             cout << "Invalid input. Grid size must be at least 3x3 and alive cells at least 1." << endl;
             return 1;
         }

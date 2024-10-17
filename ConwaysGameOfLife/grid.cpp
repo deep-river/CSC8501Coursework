@@ -5,6 +5,7 @@ Grid::Grid(int rows, int cols) : rows(rows), cols(cols) {
 }
 
 void Grid::initialize(int aliveCount) {
+    initialAliveCount = aliveCount;
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> rowDist(0, rows - 1);
@@ -105,7 +106,7 @@ bool Grid::saveExperiment(const std::string& filename, int currentStep, const st
     }
 
     outFile << rows << " " << cols << std::endl;
-    outFile << aliveCount << std::endl;
+    outFile << initialAliveCount << std::endl;
     outFile << currentStep << std::endl;
 
     // Save initial state
