@@ -63,7 +63,7 @@ int Grid<CellType>::countAliveNeighbors(int row, int col) const {
 
 // Implementation of pure virtual function from GridBase
 template <typename CellType>
-std::string Grid<CellType>::toString() const override{
+std::string Grid<CellType>::toString() const {
     std::string result;
     for (int i = 0; i < cols; i++) {
         result += ". ";
@@ -81,7 +81,7 @@ std::string Grid<CellType>::toString() const override{
 }
 
 template <typename CellType>
-std::string Grid<CellType>::toString(const std::vector<std::vector<CellType>>& printGrid) const override{
+std::string Grid<CellType>::toString(const std::vector<std::vector<CellType>>& printGrid) const {
     std::string result;
     for (int i = 0; i < cols; i++) {
         result += ". ";

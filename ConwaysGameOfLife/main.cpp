@@ -45,7 +45,6 @@ vector<vector<bool>> rotatePattern(const vector<vector<bool>>& pattern) {
             rotated[newRow][newCol] = pattern[i][j];
         }
     }
-
     return rotated;
 }
 
@@ -84,20 +83,15 @@ bool loadPattern(const string& filename, vector<vector<vector<bool>>>& patterns)
     file >> ws; // Consume newline
 
     vector<vector<bool>> pattern(rows, vector<bool>(cols, false));
-
     for (int i = 0; i < rows; ++i) {
         getline(file, line);
         for (int j = 0; j < cols; ++j) {
             pattern[i][j] = (line[j * 2 + 1] == 'O');
         }
     }
-
     file.close();
 
-    // Add original pattern
     patterns.push_back(pattern);
-
-    // Add rotated patterns
     for (int i = 1; i <= 3; ++i) {
         vector<vector<bool>> rotated = rotatePattern(patterns.back());
         if (rotated != pattern) {
@@ -115,7 +109,7 @@ patternIndex) {
     int gridCols = grid.getCols();
     const auto& originalState = grid.getState();
 
-    // Create a padded grid
+    // Create a padded grid for near boundary pattern detection
     vector<vector<bool>> paddedGrid(gridRows + 2, vector<bool>(gridCols + 2, false));
     for (int i = 0; i < gridRows; ++i) {
         for (int j = 0; j < gridCols; ++j) {
@@ -286,7 +280,9 @@ int main() {
         size_t lastDot = patternFilename.find_last_of(".");
         patternName = patternFilename.substr(lastSlash + 1, lastDot - lastSlash - 1);
 
-        /* Pattern matching using multi-threads
+        /*
+        // Pattern matching using multi-threads
+        // Commented out because it affects the step-by-step output of grid
         const int numThreads = 4;
         const int stepsPerThread = 250;  // Each thread will run for 250 steps
 
@@ -302,11 +298,9 @@ int main() {
                 threads.emplace_back(runSimulationThread, rows, cols, aliveCount, stepsPerThread,
                                      ref(patterns), ref(patternFound), i);
             }
-
             for (auto& t : threads) {
                 t.join();
             }
-
             threads.clear();
 
             if (patternFound) {
