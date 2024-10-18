@@ -162,7 +162,7 @@ string getCurrentDateTime() {
 // Function to save experiment to file
 bool saveExperiment(const Grid<bool>& grid, const string& patternName, int currentStep) {
     string filename = getCurrentDateTime() + "-" + patternName + "-" + to_string(currentStep) + ".txt";
-    return grid.saveExperiment(filename, 0, grid.getInitialState());
+    return grid.saveExperiment(filename, currentStep, grid.getInitialState());
 }
 
 // Function to run a simulation of Conway's Game of Life in a separate thread for pattern matching.

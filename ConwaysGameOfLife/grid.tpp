@@ -115,10 +115,10 @@ bool Grid<CellType>::saveExperiment(const std::string& filename, int currentStep
 
     outFile << rows << " " << cols << std::endl;
     outFile << initialAliveCount << std::endl;
-    outFile << currentStep << std::endl;
+    outFile << 0 << std::endl;
     outFile << toString(initialState) << std::endl;
 
-    outFile << "Final State:" << std::endl;
+    outFile << "Final State (in " << currentStep << " steps):" << std::endl;
     outFile << toString(cells);
 
     outFile.close();
