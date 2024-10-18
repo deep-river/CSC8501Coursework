@@ -1,4 +1,5 @@
 #pragma once
+#include "GridBase.h"
 #include <vector>
 #include <string>
 #include <random>
@@ -6,13 +7,13 @@
 #include <fstream>
 
 template <typename CellType>
-class Grid {
+class Grid: public GridBase {
 public:
     Grid(int rows, int cols);
     void initialize(int aliveCount);
     void update();
-    std::string toString() const;
-    std::string toString(const std::vector<std::vector<CellType>>& printGrid) const;
+    std::string toString() const override;
+    std::string toString(const std::vector<std::vector<CellType>>& printGrid) const override;
     bool saveToFile(const std::string& filename, int currentStep) const;
     bool saveExperiment(const std::string& filename, int currentStep, const std::vector<std::vector<CellType>>& initialState) const;
     bool loadFromFile(const std::string& filename, int& currentStep);

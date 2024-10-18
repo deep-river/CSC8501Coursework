@@ -1,4 +1,5 @@
 #include "grid.h"
+#include "GridBase.h"
 #include <random>
 #include <fstream>
 #include <iostream>
@@ -60,9 +61,9 @@ int Grid<CellType>::countAliveNeighbors(int row, int col) const {
     return aliveNeighbors;
 }
 
-// Polymorphism
+// Implementation of pure virtual function from GridBase
 template <typename CellType>
-std::string Grid<CellType>::toString() const {
+std::string Grid<CellType>::toString() const override{
     std::string result;
     for (int i = 0; i < cols; i++) {
         result += ". ";
@@ -79,9 +80,8 @@ std::string Grid<CellType>::toString() const {
     return result;
 }
 
-// Polymorphism
 template <typename CellType>
-std::string Grid<CellType>::toString(const std::vector<std::vector<CellType>>& printGrid) const {
+std::string Grid<CellType>::toString(const std::vector<std::vector<CellType>>& printGrid) const override{
     std::string result;
     for (int i = 0; i < cols; i++) {
         result += ". ";
