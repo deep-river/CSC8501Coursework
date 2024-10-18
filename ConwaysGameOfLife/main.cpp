@@ -288,6 +288,48 @@ int main() {
         size_t lastDot = patternFilename.find_last_of(".");
         patternName = patternFilename.substr(lastSlash + 1, lastDot - lastSlash - 1);
 
+        /* Pattern matching using multi-threads
+        const int numThreads = 4;
+        const int stepsPerThread = 250;  // Each thread will run for 250 steps
+
+        atomic<bool> patternFound(false);
+        vector<thread> threads;
+        int experimentCount = 0;
+
+        while (!patternFound) {
+            experimentCount++;
+            cout << "\nStarting experiment #" << experimentCount << endl;
+
+            for (int i = 0; i < numThreads; ++i) {
+                threads.emplace_back(runSimulationThread, rows, cols, aliveCount, stepsPerThread,
+                                     ref(patterns), ref(patternFound), i);
+            }
+
+            for (auto& t : threads) {
+                t.join();
+            }
+
+            threads.clear();
+
+            if (patternFound) {
+                char saveChoice;
+                cout << "Do you want to save this experiment? (y/n): ";
+                cin >> saveChoice;
+                if (saveChoice == 'y' || saveChoice == 'Y') {
+                    // Note: We need to recreate the final state to save it
+                    Grid<bool> finalGrid(rows, cols);
+                    finalGrid.initialize(aliveCount);
+                    if (saveExperiment(finalGrid, patternName, stepsPerThread)) {
+                        cout << "Experiment saved successfully." << endl;
+                    } else {
+                        cout << "Failed to save experiment." << endl;
+                    }
+                }
+            } else {
+                cout << "Pattern not found in experiment #" << experimentCount << endl;
+            }
+        }*/
+
         bool patternFound = false;
         int experimentCount = 0;
 
