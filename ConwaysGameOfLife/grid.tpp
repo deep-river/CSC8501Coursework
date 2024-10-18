@@ -1,8 +1,9 @@
 #include "grid.h"
-#include "GridBase.h"
-#include <random>
 #include <fstream>
 #include <iostream>
+#include <random>
+#include "GridBase.h"
+#include "grid.h"
 
 template <typename CellType>
 Grid<CellType>::Grid(int rows, int cols) : rows(rows), cols(cols) {

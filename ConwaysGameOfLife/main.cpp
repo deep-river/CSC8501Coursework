@@ -1,48 +1,26 @@
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <chrono>
-#include <iomanip>
-#include <thread>
 #include <atomic>
+#include <chrono>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <thread>
 #include <vector>
 #include "grid.h"
 
 using namespace std;
 
 // Function to rotate a pattern 90 degrees clockwise
+// Extra padding layer will be added to rotated pattern to keep it centered
 vector<vector<bool>> rotatePattern(const vector<vector<bool>>& pattern) {
     int rows = pattern.size();
     int cols = pattern[0].size();
     vector<vector<bool>> rotated(cols, vector<bool>(rows, false));
 
-    // Find the bounding box of the live cells
-    int minRow = rows, maxRow = 0, minCol = cols, maxCol = 0;
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
-            if (pattern[i][j]) {
-                minRow = min(minRow, i);
-                maxRow = max(maxRow, i);
-                minCol = min(minCol, j);
-                maxCol = max(maxCol, j);
-            }
-        }
-    }
-
-    // Add padding around the bounding box
-    minRow = max(0, minRow - 1);
-    maxRow = min(rows - 1, maxRow + 1);
-    minCol = max(0, minCol - 1);
-    maxCol = min(cols - 1, maxCol + 1);
-
-    // Rotate the pattern within the padded bounding box
-    for (int i = minRow; i <= maxRow; ++i) {
-        for (int j = minCol; j <= maxCol; ++j) {
-            int newCol = rows - 1 - i;
-            int newRow = j;
-            rotated[newRow][newCol] = pattern[i][j];
+            rotated[j][rows - 1 - i] = pattern[i][j];
         }
     }
     return rotated;
@@ -82,8 +60,10 @@ bool loadPattern(const string& filename, vector<vector<vector<bool>>>& patterns)
     file >> sequenceIndex;
     file >> ws; // Consume newline
 
+    getline(file, line); // Consume first line of '.' as top boundary
+
     vector<vector<bool>> pattern(rows, vector<bool>(cols, false));
-    for (int i = 0; i < rows; ++i) {
+    for (int i = 0; i < rows; i++) {
         getline(file, line);
         for (int j = 0; j < cols; ++j) {
             pattern[i][j] = (line[j * 2 + 1] == 'O');
@@ -191,7 +171,8 @@ int main() {
     cout << "1. Start a new simulation\n";
     cout << "2. Load simulation from file\n";
     cout << "3. Run until find a life pattern\n";
-    cout << "Enter your choice (1 - 3): ";
+    cout << "4. Load and display a pattern\n";
+    cout << "Enter your choice (1 - 4): ";
     int choice;
     cin >> choice;
 
@@ -379,6 +360,56 @@ int main() {
             }
 
             delete grid;
+        }
+    }
+    else if (choice == 4) {  // Option to help debugging
+        string filename;
+        cout << "Enter the filename of the pattern to load: ";
+        cin >> filename;
+
+        if (loadPattern(filename, patterns)) {
+            cout << "Pattern loaded successfully.\n\n";
+            cout << "Original pattern:\n";
+            cout << '.';
+            for (bool cell : patterns[0][0]) {
+                cout << " .";
+            }
+            cout << "\n";
+            for (const auto& row : patterns[0]) {
+                cout << '.';
+                for (bool cell : row) {
+                    cout << (cell ? "O." : " .");
+                }
+                cout << "\n";
+            }
+
+            cout << "\nRotated patterns:\n";
+            for (size_t i = 1; i < patterns.size(); ++i) {
+                cout << "Rotation " << i * 90 << " degrees:\n";
+                cout << '.';
+                for (bool cell : patterns[i][0]) {
+                    cout << " .";
+                }
+                cout << "\n";
+                for (const auto& row : patterns[i]) {
+                    cout << '.';
+                    for (bool cell : row) {
+                        cout << (cell ? "O." : " .");
+                    }
+                    cout << "\n";
+                }
+                cout << "\n";
+            }
+
+            cout << "Enter 1 to exit: ";
+            int exitChoice;
+            cin >> exitChoice;
+            if (exitChoice == 1) {
+                return 0;
+            }
+        } else {
+            cout << "Failed to load pattern. Exiting.\n";
+            return 1;
         }
     }
     else {
