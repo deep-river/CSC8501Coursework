@@ -192,7 +192,6 @@ int main() {
     int rows, cols, aliveCount, steps;
     int currentStep = 0;
 
-    // Initial choice: new simulation or load from file
     cout << "Conway's Game of Life Simulation\n";
     cout << "---------------------------------\n";
     cout << "1. Start a new simulation\n";
@@ -252,7 +251,6 @@ int main() {
             return 1;  // Exit if loading fails
         }
 
-        // Optionally, ask for number of steps to continue
         cout << "Enter the number of additional steps to simulate: ";
         cin >> steps;
 
@@ -347,7 +345,6 @@ int main() {
 
             // Simulation loop
             for (int step = 0; step < steps && !patternFound; step++) {
-                // Update grid
                 grid->update();
                 currentStep++;
 
@@ -395,18 +392,14 @@ int main() {
         return 1;
     }
 
-    // Simulation loop for choices 1 and 2
     if (choice == 1 || choice == 2) {
         for (int step = 0; step < steps; step++) {
-            // Update grid
             grid->update();
             currentStep++;
 
-            // Display current step
             cout << "\nStep " << currentStep << ":\n";
             cout << grid->toString();
 
-            // Prompt user for action
             cout << "\nChoose an action:\n";
             cout << "1. Continue to next step\n";
             cout << "2. Save and exit\n";
@@ -417,7 +410,7 @@ int main() {
             cin >> action;
 
             if (action == 1) {
-                continue;  // Proceed to next step
+                continue;
             }
             else if (action == 2) {
                 // Save and exit
@@ -456,7 +449,6 @@ int main() {
                 }
             }
             else if (action == 4) {
-                // Exit without saving
                 cout << "Exiting without saving." << endl;
                 delete grid;
                 return 0;
