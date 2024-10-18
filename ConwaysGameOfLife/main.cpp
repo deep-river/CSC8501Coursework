@@ -5,6 +5,9 @@
 #include <vector>
 #include <chrono>
 #include <iomanip>
+#include <thread>
+#include <atomic>
+#include <vector>
 #include "grid.h"
 
 using namespace std;
@@ -160,6 +163,26 @@ string getCurrentDateTime() {
 bool saveExperiment(const Grid<bool>& grid, const string& patternName, int currentStep) {
     string filename = getCurrentDateTime() + "-" + patternName + "-" + to_string(currentStep) + ".txt";
     return grid.saveExperiment(filename, 0, grid.getInitialState());
+}
+
+// Function to run a simulation of Conway's Game of Life in a separate thread for pattern matching.
+void runSimulationThread(int rows, int cols, int aliveCount, int steps,
+    const vector<vector<vector<bool>>>& patterns, atomic<bool>& patternFound, int threadId) {
+    Grid<bool> grid(rows, cols);
+    grid.initialize(aliveCount);
+
+    for (int step = 0; step < steps && !patternFound; ++step) {
+        grid.update();
+
+        int row, col, patternIndex;
+        if (findPattern(grid, patterns, row, col, patternIndex)) {
+            patternFound = true;
+            cout << "Thread " << threadId << " found a pattern at step " << step << endl;
+            cout << "Pattern found at position (" << row << ", " << col << ")" << endl;
+            cout << "Rotation: " << patternIndex * 90 << " degrees" << endl;
+            break;
+        }
+    }
 }
 
 

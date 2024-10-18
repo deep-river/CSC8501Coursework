@@ -60,6 +60,7 @@ int Grid<CellType>::countAliveNeighbors(int row, int col) const {
     return aliveNeighbors;
 }
 
+// Polymorphism
 template <typename CellType>
 std::string Grid<CellType>::toString() const {
     std::string result;
@@ -78,6 +79,7 @@ std::string Grid<CellType>::toString() const {
     return result;
 }
 
+// Polymorphism
 template <typename CellType>
 std::string Grid<CellType>::toString(const std::vector<std::vector<CellType>>& printGrid) const {
     std::string result;
